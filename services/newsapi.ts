@@ -26,7 +26,6 @@ export const fetchTopHeadlines = async (
     }
 
     const queryParams = new URLSearchParams({
-        apiKey: NEWS_API_KEY,
         page: page.toString(),
         pageSize: pageSize.toString(),
         country,
@@ -37,8 +36,13 @@ export const fetchTopHeadlines = async (
     const url = `${NEWS_API_BASE_URL}/top-headlines?${queryParams.toString()}`;
     try {
 
-        const response = await fetch(url);
-        const data: NewsAPIResponse = await response.json()
+        const response = await fetch(url, {
+            headers: { "X-Api-Key": NEWS_API_KEY },
+        });
+        if (!response.ok) {
+            throw new Error(`NewsAPI request failed with status ${response.status}`);
+        }
+        const data: NewsAPIResponse = await response.json();
         return data;
     } catch (error) {
         console.log("Failed to fetch news:", error);
